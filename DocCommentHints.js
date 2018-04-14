@@ -35,7 +35,7 @@ define(function (require, exports, module) {
         KeyEvent            = brackets.getModule('utils/KeyEvent');
 
     var templates = JSON.parse(require("text!templates/Templates.json"));
-    var jsDocTags = JSON.parse(require("text!js.json"));
+    var jsDocTags = JSON.parse(require("text!JSDocTags.json"));
     var editor = EditorManager.getActiveEditor();
     var hintsType;
     
@@ -78,16 +78,16 @@ define(function (require, exports, module) {
         return templateText + "*/";
     }
 
-    function _insertHintFromTemplate(template, args, rangeToReplace) {
+    function _insertHintFromTemplate(template, args = {}, rangeToReplace) {
         var templateText;
-        if (args instanceof Object && (Object.getOwnPropertyNames(args).length > 0)) {
+        if (args instanceof Object && (Object.getOwnPropertyNames(args).length > 0) && args.params) {
             templateText = _modifyDocTemplate(template, args.params, args.returnStatement);
         } else {
             templateText = templates[template];
         }
 
         var compiled = _.template(templateText),
-            formattedText = compiled();
+            formattedText = compiled(args);
 
         if (!rangeToReplace) {
             rangeToReplace = EditorManager.getActiveEditor().getSelection();
@@ -113,7 +113,11 @@ define(function (require, exports, module) {
             isCtor = false;
         if (node.params && node.params.length > 0) {
             node.params.forEach(function (item) {
-                params.push(item.name);
+                if (item.name) {
+                    params.push(item.name);
+                } else if (item.left && item.left.name) {
+                    params.push(item.left.name + "=" + item.right.raw);
+                }
             });
         }
         // TODO - the way we are trying to find return statement
@@ -150,6 +154,9 @@ define(function (require, exports, module) {
         } else if (node.type === "Property" && node.value.type === "FunctionExpression") {
             // For properties like : var x = {sum: function(a, b) {return a+b}}
             funcDetails = _getFunctionDetailsFromNode(node);
+        } else if (node.type === "LabeledStatement" && node.body.type === "FunctionDeclaration") {
+            // For properties like : var x = {sum: function(a, b) {return a+b}}
+            funcDetails = _getFunctionDetailsFromNode(node.body);
         }
         if (funcDetails) {
             _insertHintFromTemplate(funcDetails.isCtor === true ? "constructorFunction" : "functionJSDoc",
@@ -163,6 +170,10 @@ define(function (require, exports, module) {
         if (node.type === "VariableDeclaration" && node.kind) {
             node.kind === "const" ? _insertHintFromTemplate("constantJSDoc") : _insertHintFromTemplate("varDeclJSDoc");
             return true;
+        } else if (node.type === "ExpressionStatement" && node.expression.type === "AssignmentExpression" &&
+        node.expression.right.type === "Identifier") {
+            _insertHintFromTemplate("varDeclJSDoc");
+            return true;
         }
         return false;
     }
@@ -172,11 +183,26 @@ define(function (require, exports, module) {
     }
 
     function _checkForNextClassNode(node) {
+        if (node.type === "ClassDeclaration") {
+            if (node.superClass) {
+                _insertHintFromTemplate("classDeclWithExtends", {superClass: node.superClass.name});
+            } else {
+                _insertHintFromTemplate("classDeclWithClassSyntx");
 
+            }
+            return true;
+        }
+        return false;
     }
 
     function _checkForClassMember(node) {
 
+    }
+    
+    function _checkForMemberNodes(node) {
+        if (node.type === "Property" && node.kind === "init") {
+            _insertHintFromTemplate("memberJSDoc");
+        }
     }
 
     function _insideDocComment(editor, startPos, endPos) {
@@ -315,6 +341,7 @@ define(function (require, exports, module) {
             break;
         case "{":
         case "}":
+        case "|":
             hintsType = "jsDocDataTypes";
             break;
         default:
@@ -322,7 +349,6 @@ define(function (require, exports, module) {
         }
         return true;
     }
-    /**
     /**
     * @constructor
     */
@@ -422,9 +448,11 @@ define(function (require, exports, module) {
         } else if (_checkForNextDeclNodes(nextNode)) { // Variable Declaration
             templateInserted = true;
         } else if (_checkForNextClassNode(nextNode)) {
-            
+            templateInserted = true;
         } else if (_checkForClassMember(nextNode)) {
-                   
+            templateInserted = true;
+        } else if (_checkForMemberNodes(nextNode)) {
+            templateInserted = true;
         } else {
             _insertHintFromTemplate("blankJSDoc", {});
         }
@@ -466,7 +494,7 @@ define(function (require, exports, module) {
     
     /**
      * Inserts the hint selected by the user into the current editor.
-     * @@access [[Access<private|protected|public>]]
+     * @access [[Access<private|protected|public>]]
      * {}
      * @param {jQuery.Object} $hintObj - hint object to insert into current editor
      * @return {boolean} - should a new hinting session be requested

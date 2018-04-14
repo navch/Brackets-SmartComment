@@ -29,6 +29,7 @@ define(function (require, exports, module) {
 //		RefactoringUtils	 = require("RefactoringUtils"),
 		EditorManager		 = brackets.getModule("editor/EditorManager"),
 		AcornLoose    		 = brackets.getModule("thirdparty/acorn/dist/acorn_loose"),
+        DocCommentHints		 = require("./DocCommentHints"),
         SmartComment         = require("DocCommentHints");
 
 //	var RefactoringSession   = RefactoringUtils.RefactoringSession;
@@ -71,5 +72,7 @@ define(function (require, exports, module) {
             }
 		}
 		EditorManager.on("activeEditorChange", activeEditorChangeHandler);
+        
+        DocCommentHints.registerDocHints();
     });
 });
