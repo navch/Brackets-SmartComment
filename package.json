@@ -1,0 +1,28 @@
+{
+  "name": "jsdoc.smartcomment",
+  "title": "Smart JSDoc Comment",
+  "description": "Generates JS Doc comment, helps with hinting of type inside comment",
+  "version": "1.0.0",
+  "author": "Naveen Choudhary <choudhary.nav2@gmail.com> (https://github.com/navch/)",
+  "license": "MIT",
+  "engines": {
+    "brackets": ">=1.12.0"
+  },
+  "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/navch/smart-js-comment.git"
+  },
+  "keywords": [
+    "comment",
+    "hints",
+    "brackets",
+    "Javascript",
+    "jsdoc",
+    "generate"
+  ],
+  "bugs": {
+    "url": "https://github.com/navch/smart-js-comment/issues"
+  },
+  "homepage": "https://github.com/navch/smart-js-comment"
+}
