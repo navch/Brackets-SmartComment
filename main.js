@@ -28,32 +28,37 @@ define(function (require, exports, module) {
     var AppInit              = brackets.getModule("utils/AppInit"),
 //		RefactoringUtils	 = require("RefactoringUtils"),
 		EditorManager		 = brackets.getModule("editor/EditorManager"),
+        CodeHintManager      = brackets.getModule("editor/CodeHintManager"),
 		AcornLoose    		 = brackets.getModule("thirdparty/acorn/dist/acorn_loose"),
         DocCommentHints		 = require("./DocCommentHints"),
         SmartComment         = require("DocCommentHints");
+    
+    var hintsOpen = false;
 
 //	var RefactoringSession   = RefactoringUtils.RefactoringSession;
 
     AppInit.appReady(function () {
 
-		function _handleKeydownEvent(jqEvent, editor, event) {
-			//keyDownEditor = editor;
-			
-			
-			if (!(event.ctrlKey || event.altKey || event.metaKey) &&
-					(event.keyCode === 14 ||
-					 event.keyCode === 13)) {
-				var prevCursorLine = editor.getSelection().start.line - 1;
+        function _handleKeyEvent(jqEvent, editor, event) {
+
+            if (!(event.ctrlKey || event.altKey || event.metaKey) &&
+					(event.keyCode === 14 || event.keyCode === 13)) {
+                var prevCursorLine = editor.getSelection().start.line - 1;
                 if(prevCursorLine >= 0 && editor.document.getLine(prevCursorLine)) {
-                
+
                     var tokenType = editor._codeMirror.getTokenTypeAt({line: prevCursorLine, ch: editor.document.getLine(prevCursorLine).length - 1});
-                    if (tokenType === "m-javascript comment") {
+                    if ((tokenType === "m-javascript comment" || tokenType === "comment") && !hintsOpen) {
                         //var lastChar = String.fromCharCode(event.keyCode);
 //                        var xyz =  new RefactoringSession(editor);
                         AcornLoose.parse_dammit(editor.document.getText(), {onComment: function (block, text, start, end){
                             if (block === true && text[0] === "*" && editor.indexFromPos(editor.getSelection().start) > start &&
                                editor.indexFromPos(editor.getSelection().end) < end) {
-                                editor.document.replaceRange("* ", editor.getSelection().start);
+                                var pos = editor.getSelection();
+                                // Hard to find when we are inseting hints
+                                // Don;t do wnything when we are inserting hints
+                                if (editor.document.getLine(pos.start.line).trim() === "") {
+                                    editor.document.replaceRange("* ", editor.getSelection().start);
+                                }
                             }
                         }});
                     }
@@ -63,12 +68,12 @@ define(function (require, exports, module) {
 
 		function activeEditorChangeHandler(event, current, previous) {
             if (current) {
-                current.on("keyup", _handleKeydownEvent);
+                current.on("keyup", _handleKeyEvent);
             }
 
             if (previous) {
                 //Removing all old Handlers
-                previous.off("keyup", _handleKeydownEvent);
+                current.off("keyup", _handleKeyEvent);
             }
 		}
 		EditorManager.on("activeEditorChange", activeEditorChangeHandler);
