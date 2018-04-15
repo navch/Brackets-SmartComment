@@ -226,7 +226,7 @@ define(function (require, exports, module) {
     }
 /**
  * 
- * 
+ * @aurhor
  * @param {{type}} hints [[Description]]
  * @param {{type}} query [[Description]]
  * @return {{type}} [[Description]]
@@ -239,7 +239,14 @@ define(function (require, exports, module) {
             } else {
                 $hintObj.text(token);
             }
-            $('<span>' + "JSDoc comment" + '</span>').appendTo($hintObj).addClass("brackets-js-hints-type-details");
+            
+            if (hintsType === "jsDocTags"){
+                $('<span>' + token.Desc.trim() + '</span>').appendTo($hintObj).addClass("jshint-description");
+            } else if(hintsType === "jsDocTemplate") {
+                token.type = "JSDoc Comment Syntax";
+                $('<span>' + token.type + '</span>').appendTo($hintObj).addClass("jshint-description");   
+            }
+            
             $hintObj.data("token", token);
             return $hintObj;
 //            return filterWithQueryAndMatcher($hintObj, getStringMatcher(), query)
@@ -248,7 +255,7 @@ define(function (require, exports, module) {
     }
 
     function docCommentHint(editor, query) {
-        var hints = ["\/** *\/"];
+        var hints = [{"value": "\/** *\/", "type": "JSDoc Comment"}];
         var token = TokenUtils.getTokenAt(editor._codeMirror,
                 {line: editor.getSelection().start.line, ch: editor.getSelection().start.ch});
 
@@ -419,7 +426,6 @@ define(function (require, exports, module) {
         return false;
     };
 
-    /*
     /**
      *  Create a new StringMatcher instance, if needed.
      *
@@ -449,6 +455,14 @@ define(function (require, exports, module) {
                 var searchResult = matcher.match(hint.value, query);
                 if (searchResult) {
                     searchResult.value = hint.value;
+                }
+                
+                if (searchResult && hintsType === "jsDocTags") {
+                    searchResult.Desc = hint.Desc;
+                }
+                
+                if (searchResult && hintsType === "jsDocTemplate") {
+                    searchResult.type = hint.type;
                 }
 
                 return searchResult;
@@ -507,7 +521,7 @@ define(function (require, exports, module) {
         return hints;
     };
 
-    /**
+
     function insertJSDocTemplate($hintObj) {
         var editor = EditorManager.getActiveEditor();
         var doc = editor.document;

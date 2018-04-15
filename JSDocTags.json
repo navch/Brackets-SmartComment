@@ -80,6 +80,7 @@
         "array": {"value":"Array"},
         "object": {"value":"object"},
         "regexp": {"value":"RegExp"},
-        "function": {"value":"function"}
+        "function": {"value":"function"},
+        "promise": {"value": "promise"}
     }
 }	

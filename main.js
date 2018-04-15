@@ -30,6 +30,8 @@ define(function (require, exports, module) {
 		EditorManager		 = brackets.getModule("editor/EditorManager"),
         CodeHintManager      = brackets.getModule("editor/CodeHintManager"),
 		AcornLoose    		 = brackets.getModule("thirdparty/acorn/dist/acorn_loose"),
+		CommandManager    	 = brackets.getModule("command/CommandManager"),
+		Menus    	 = brackets.getModule("command/Menus"),
         DocCommentHints		 = require("./DocCommentHints"),
         SmartComment         = require("DocCommentHints");
     
@@ -73,10 +75,23 @@ define(function (require, exports, module) {
 
             if (previous) {
                 //Removing all old Handlers
-                current.off("keyup", _handleKeyEvent);
+                previous.off("keyup", _handleKeyEvent);
             }
 		}
 		EditorManager.on("activeEditorChange", activeEditorChangeHandler);
+
+        CommandManager.register("Select Comment", "select.complete.comment", function () {
+            var editor = EditorManager.getActiveEditor();
+            AcornLoose.parse_dammit(editor.document.getText(), {onComment: function (block, text, start, end){
+                if (block === true && text[0] === "*" && editor.indexFromPos(editor.getSelection().start) > start &&
+                   editor.indexFromPos(editor.getSelection().end) < end) {
+                    var start = editor.posFromIndex(start),
+                    end = editor.posFromIndex(end);
+                    editor.setSelection({ch: start.ch + 3, line: start.line}, {ch: end.ch - 2, line: end.line});
+                }
+            }});
+        });
+        Menus.getMenu(Menus.AppMenuBar.EDIT_MENU).addMenuItem("select.complete.comment", "Ctrl-Alt-A");
         
         DocCommentHints.registerDocHints();
     });
