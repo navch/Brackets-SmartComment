@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2013 - present Adobe Systems Incorporated. All rights reserved.
+ * The MIT License (MIT)
+ * Copyright (c) 2018 Naveen Choudhary.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -27,13 +28,11 @@ define(function (require, exports, module) {
     var CodeHintManager      = brackets.getModule("editor/CodeHintManager"),
         EditorManager        = brackets.getModule("editor/EditorManager"),
         AppInit              = brackets.getModule("utils/AppInit"),
-        HintUtils            = brackets.getModule("JSUtils/HintUtils"),
         _                    = brackets.getModule("thirdparty/lodash"),
         TokenUtils           = brackets.getModule("utils/TokenUtils"),
         ASTWalker            = brackets.getModule("thirdparty/acorn/dist/walk"),
         AcornLoose           = brackets.getModule("thirdparty/acorn/dist/acorn_loose"),
         KeyEvent             = brackets.getModule('utils/KeyEvent'),
-        Session              = brackets.getModule("JSUtils/Session"),
         StringMatch          = brackets.getModule("utils/StringMatch");
 
     var templates = JSON.parse(require("text!templates/Templates.json")),
@@ -325,10 +324,10 @@ define(function (require, exports, module) {
                     cursorIndex = editor.indexFromPos(cursonPos);
                     
                 
-                var nextTag = getCurrentDocTags(document.getRange(editor.getCursorPos(), editor.posFromIndex(commentDetails.end))),
+                var nextTag = getCurrentDocTags(document.getRange(editor.getCursorPos(), editor._codeMirror.posFromIndex(commentDetails.end))),
                     nextTagIndex;
                 if (!nextTag) {
-                    nextTag = getCurrentDocTags(document.getRange(editor.posFromIndex(commentDetails.start), editor.getCursorPos()));
+                    nextTag = getCurrentDocTags(document.getRange(editor._codeMirror.posFromIndex(commentDetails.start), editor.getCursorPos()));
                     if (nextTag && nextTag.length > 0) {
                         nextTagIndex = commentDetails.start + nextTag.index;
                     }
@@ -336,7 +335,7 @@ define(function (require, exports, module) {
                     nextTagIndex = cursorIndex + nextTag.index;
                 }
                 if (nextTag) {
-                    editor.setSelection(editor.posFromIndex(nextTagIndex), editor.posFromIndex(nextTagIndex + nextTag[0].length));
+                    editor.setSelection(editor._codeMirror.posFromIndex(nextTagIndex), editor._codeMirror.posFromIndex(nextTagIndex + nextTag[0].length));
                     event.preventDefault();
                 }
             }
@@ -655,7 +654,7 @@ define(function (require, exports, module) {
 
         function registerDocHints() {
             var jsDocHints = new JSDocHints();
-            CodeHintManager.registerHintProvider(jsDocHints, HintUtils.SUPPORTED_LANGUAGES, -1);
+            CodeHintManager.registerHintProvider(jsDocHints, ["javascript", "jsx", "html", "php"], -1);
         }
         exports.registerDocHints = registerDocHints;
     });
