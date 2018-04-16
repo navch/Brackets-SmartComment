@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2013 - present Adobe Systems Incorporated. All rights reserved.
+ * The MIT License (MIT)
+ * Copyright (c) 2018 Naveen Choudhary.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -85,8 +86,8 @@ define(function (require, exports, module) {
             AcornLoose.parse_dammit(editor.document.getText(), {onComment: function (block, text, start, end){
                 if (block === true && text[0] === "*" && editor.indexFromPos(editor.getSelection().start) > start &&
                    editor.indexFromPos(editor.getSelection().end) < end) {
-                    var start = editor.posFromIndex(start),
-                    end = editor.posFromIndex(end);
+                    start = editor._codeMirror.posFromIndex(start);
+                    end = editor._codeMirror.posFromIndex(end);
                     editor.setSelection({ch: start.ch + 3, line: start.line}, {ch: end.ch - 2, line: end.line});
                 }
             }});
