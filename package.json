@@ -6,7 +6,7 @@
   "author": "Naveen Choudhary <choudhary.nav2@gmail.com> (https://github.com/navch/)",
   "license": "MIT",
   "engines": {
-    "brackets": ">=1.12.0"
+    "brackets": ">=1.11.0"
   },
   "main": "main.js",
   "repository": {
