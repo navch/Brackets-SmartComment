@@ -3,10 +3,11 @@ Generates JS Doc comment helps with the hinting of types and tags inside comment
 
 ## Generate doc comment for js functions, classes, constants, property etc
 1) Start typing /**
-2) You will get a hint /** */
-3) Insert this hint (this will generate doc comment)
+2) One hint will pop-up
+3) Insert hint (this will generate doc comment)
 
-This will generate something like this depending on next node (function, class etc)
+### example Generating comment for function
+In case of function this is taking care of parameters name, number of parameters, return statement etc
 ```
 /**
  *
@@ -19,12 +20,16 @@ This will generate something like this depending on next node (function, class e
 
 ## Navigate inside comment
 1) Bring your cursor inside comment
-2) Press tab ( this will select next item wrapped in square brackets i.e. [[Description]]
+2) Press tab (It will select next item wrapped in square brackets i.e. [[Description]])
+* Inspired by https://github.com/wikunia/brackets-funcdocr
+* This is a great extension which documents functions and supports multiple languages
+Note:- Together these extensions may behave wrong
+According to me, For Js language you can use this extension for others FuncDocr is the right choice
 
 ## Hints inside comment
-1) You can get hints for types just remove type and press ctrl+space
+1) Select type by pressing tab, remove it and press ctr+space
 2) Tag hints, tag hints will pop up on pressing @
-3) You can also see the purpose of the selected tag
+3) The description is also available on selecting a tag
 
 ### Hints
 ![Hints](https://github.com/navch/Brackets-SmartComment/blob/master/screenshots/taghints.png)
