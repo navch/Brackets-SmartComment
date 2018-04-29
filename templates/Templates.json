@@ -1,12 +1,12 @@
 {
-    "blankJSDoc": "/**\n *\n */",
+    "blankJSDoc": "/**\n * \n */",
     "constructorFunction": "/**\n * \n * @constructor\n",
-    "functionJSDoc": "/**\n *\n",
-    "parameterJSDoc": " * @param {type} ${paramName} [[Description]]\n",
-    "returnJSDoc": " * @return {type} [[Description]]\n",
+    "functionJSDoc": "/**\n * \n",
+    "parameterJSDoc": " * @param {[[type]]} ${paramName} [[Description]]\n",
+    "returnJSDoc": " * @return {[[type]]} [[Description]]\n",
     "constantJSDoc": "/**\n * @constant {{type}}\n */",
-    "varDeclJSDoc": "/**\n * @type {type}\n */",
-    "memberJSDoc": "/**\n * @member {type}\n */",
+    "varDeclJSDoc": "/**\n * @type {[[type]]}\n */",
+    "memberJSDoc": "/**\n * @member {[[type]]}\n */",
     "namespaceJSDoc": "/**\n * @namespace\n */",
     "classDeclWithClassSyntx": "/** \n * @class\n * @classdesc [[Description]]\n */",
     "classDeclWithExtends": "/** \n * @class\n * @classdesc [[Description]]\n * @extends ${superClass}\n */"

@@ -78,9 +78,17 @@ define(function (require, exports, module) {
         }
         return templateText + "*/";
     }
-
+/**
+ * 
+ * @param {[[type]]} template [[Description]]
+ * @param {[[type]]} args=undefined [[Description]]
+ * @param {[[type]]} rangeToReplace [[Description]]
+ */
     function _insertHintFromTemplate(template, args = {}, rangeToReplace) {
-        var templateText;
+        var templateText,
+            editor = EditorManager.getActiveEditor(),
+            doc = editor.document;
+        
         if (args instanceof Object && (Object.getOwnPropertyNames(args).length > 0) && args.params) {
             templateText = _modifyDocTemplate(template, args.params, args.returnStatement);
         } else {
@@ -94,7 +102,7 @@ define(function (require, exports, module) {
             rangeToReplace = EditorManager.getActiveEditor().getSelection();
         }
 
-        EditorManager.getActiveEditor().document.replaceRange(formattedText, rangeToReplace.start, rangeToReplace.end);
+        doc.replaceRange(formattedText, rangeToReplace.start, rangeToReplace.end);
 
         var startLine = rangeToReplace.start.line,
             endLine = startLine + formattedText.split("\n").length;
@@ -102,6 +110,9 @@ define(function (require, exports, module) {
         for (var i = startLine + 2; i < endLine; i++) {
             EditorManager.getActiveEditor()._codeMirror.indentLine(i, "prev", true);
         }
+        var secondLineText = doc.getLine(startLine + 1);
+        
+        editor.setSelection({line: startLine + 1, ch: secondLineText.length});
     }
 
     function _insertDocForNextFunctionNode() {
@@ -304,13 +315,7 @@ define(function (require, exports, module) {
         return nextTag;
     }
 
-    /**
-     * Handle the key Event jump to handleEnter,handleTab (inside a doc block)
-     *  or generate a docblock if the currentLine is /** or do nothing
-     * @access    [[Access<private|protected|public>]]
-     * @@aug    ments [[Link]]  
-     * @param {Object} event key event
-     */
+
     function handleTabInsidejsDocComment(event) {
         var editor = EditorManager.getCurrentFullEditor();
         var selection = editor.getSelection();
@@ -336,7 +341,7 @@ define(function (require, exports, module) {
                 }
                 if (nextTag) {
                     editor.setSelection(editor._codeMirror.posFromIndex(nextTagIndex), editor._codeMirror.posFromIndex(nextTagIndex + nextTag[0].length));
-                    event.preventDefault();
+//                    event.preventDefault();
                 }
             }
         }
