@@ -45,7 +45,6 @@ According to me, For Js language you can use this extension for others FuncDocr 
 
 ## Known Issues
 * Indentation issue in generated Comment
-* Set Cursor at more useful position
 
 ## TODO Items
 * Check comment on the fly and give errors to the user in real-time
